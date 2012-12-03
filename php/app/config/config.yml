@@ -1,0 +1,65 @@
+imports:
+    - { resource: parameters.yml }
+#    - { resource: security.yml }
+    - { resource: @ModelBundle/Resources/config/services.yml }
+
+framework:
+    #esi:             ~
+    #translator:      { fallback: %locale% }
+    secret:          %secret%
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"
+        strict_requirements: %kernel.debug%
+    form:            true
+    csrf_protection: true
+    validation:      { enable_annotations: true }
+    templating:      { engines: ['twig'] } #assets_version: SomeVersionScheme
+    default_locale:  %locale%
+    trust_proxy_headers: false # Whether or not the Request object should trust proxy headers (X_FORWARDED_FOR/HTTP_CLIENT_IP)
+    session:         ~
+
+# Twig Configuration
+twig:
+    debug:            %kernel.debug%
+    strict_variables: %kernel.debug%
+    # sets global theme for all forms
+    form:
+        resources:
+            - 'ModelBundle:Form:fields.html.twig'
+
+# Assetic Configuration
+assetic:
+    debug:          %kernel.debug%
+    use_controller: false
+    bundles:        [ ]
+    #java: /usr/bin/java
+    filters:
+        cssrewrite: ~
+        #closure:
+        #    jar: %kernel.root_dir%/Resources/java/compiler.jar
+        #yui_css:
+        #    jar: %kernel.root_dir%/Resources/java/yuicompressor-2.4.7.jar
+
+
+services:
+    #adds messages to twig templates as global variable
+    messenger:
+        class: NGS\ModelBundle\Extension\Messenger
+        tags:
+            - { name: twig.extension }
+        arguments: ["_messages", @session]
+
+    kernel.listener.exception_listener:
+        class: NGS\ModelBundle\Listener\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+        arguments:
+            - @service_container
+
+    kernel.listener.response_listener:
+        class: NGS\ModelBundle\Listener\ResponseListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+        arguments:
+            - @service_container

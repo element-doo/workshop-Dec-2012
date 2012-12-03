@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		{% block html_headers %}
+			<title>
+				{% block html_title %}
+					CRUD
+				{% endblock %}
+			</title>
+			<link href="/css/bootstrap.css" type="text/css" rel="stylesheet" />
+			<link href="/shared/css/bootstrap-responsive-2.1.1.css" type="text/css" rel="stylesheet" />
+		{% endblock %}
+	</head>
+	<body>
+		{% block error %}
+			{% if error is defined %}
+				<div class="alert alert-error">
+					{{ error }}
+				</div>
+			{% endif %}
+		{% endblock %}
+		{% block html_body %}
+
+		{% endblock %}
+	</body>
+</html>

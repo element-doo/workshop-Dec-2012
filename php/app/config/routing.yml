@@ -1,0 +1,16 @@
+skola_admin:
+    resource: "@SkolaAdminBundle/Controller"
+    prefix:   /
+
+root:
+    pattern: /
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /student
+        permanent: true
+
+login_check:
+    pattern: /admin/login_check
+
+logout:
+    pattern: /admin/logout

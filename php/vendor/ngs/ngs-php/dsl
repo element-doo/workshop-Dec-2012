@@ -1,0 +1,226 @@
+#!/usr/bin/env php
+<?php
+
+/*
+define('DIR_ROOT', realpath(__DIR__.'/../..'));
+define('DIR_DSL', DIR_ROOT.'/DSL');
+define('DIR_MODEL', DIR_ROOT.'/php/src/Model');
+define('NGS_URI', 'http://winblows.element.hr/server/RestApplication.svc/PhpSourceService');
+*/
+
+function e($text)
+{
+    echo $text."\n";
+}
+
+class DslGen
+{
+    protected $uri;
+    protected $dir_dsl;
+    protected $dir_model;
+
+    public function __construct($uri, $dir_dsl, $dir_model)
+    {
+        $this->uri = $uri;
+        $this->dir_dsl = $dir_dsl;
+        $this->dir_model = $dir_model;
+    }
+
+    private static function readDirs($dir)
+    {
+        $files = array();
+        $dirHandle = opendir($dir);
+
+        while($file = readdir($dirHandle)) {
+            if(is_dir($dir.'/'.$file) && $file != '.' && $file != '..') {
+
+                $subfiles = self::readDirs($dir.'/'.$file);
+                foreach($subfiles as $f)
+                    $files[] = $f;
+            }
+            else {
+                $files[] = $dir.'/'.$file;
+            }
+        }
+        return $files;
+    }
+
+    public function getDslFiles($dir)
+    {
+        $files = self::readDirs($dir);
+        $dsl_files = array();
+        foreach($files as $file)
+            if(strpos($file, '.dsl')!==false)
+                $dsl_files[] = $file;
+        return $dsl_files;
+    }
+
+    // Merges into string contents of all .dsl files in target dir
+    public function getDslString($files)
+    {
+        $dsl = '';
+
+        foreach ($files as $file) {
+            $contents = file_get_contents($file);
+            $msg = $file.', size='.strlen($contents);
+
+            // skip BOM bytes at beginning of file
+            // BOM causes syntax error in parsing DSL on server
+            $BOMcheck = substr($contents, 0, 3);
+
+            if ($BOMcheck == b"\xEF\xBB\xBF") {
+                $msg .= ', removed BOM';
+                $contents = substr($contents, 3);
+            }
+            e($msg);
+            $dsl .= $contents."\n";
+        }
+        $dsl = '"'.stripslashes($dsl).'"';
+        return $dsl;
+    }
+
+    private function initClient($requestBody)
+    {
+        $ch = curl_init($this->uri);
+
+
+        $username = 'nutrija';
+        $password = 'n';
+        $http_auth = base64_encode($username.':'.$password);
+
+
+        $options = array(
+            CURLOPT_HEADER          => 0,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLINFO_HEADER_OUT     => true,
+            CURLOPT_HTTPHEADER      => array(
+                'Accept: application/json',
+                'Content-type: application/json',
+                'Authorization: Basic '.$http_auth
+            ),
+            CURLOPT_POST       => true,
+            CURLOPT_POSTFIELDS => $requestBody
+        );
+        foreach ($options as $option=>$value) {
+            curl_setopt($ch, $option, $value);
+        }
+        return $ch;
+    }
+
+    /**
+     * Sends DSL to server
+     */
+    public function sendRequest($requestBody)
+    {
+        $ch = $this->initClient($requestBody);
+
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+
+        return $response;
+    }
+
+    /**
+     * Saves generated files by psr-0 standard
+     */
+    public function saveFiles($files, $dir)
+    {
+        if(!is_dir($dir)) {
+            mkdir($dir);
+        }
+
+        foreach($files as $name=>$source) {
+            $chunks = explode('\\', $name);
+
+            $folder = $dir;
+            for($i=0; $i<count($chunks)-1; $i++) {
+                $folder .= '/'.$chunks[$i];
+                if(!is_dir($folder)) {
+                    mkdir($folder);
+                    e('Creating folder: '.$folder);
+                }
+            }
+
+            $path = $dir .'/'. implode('/', $chunks).'.php';
+            e($path);
+
+            if(!file_put_contents($path, $source)) {
+                e('ERROR: could not save file to: '.$path);
+                die;
+            }
+        }
+    }
+
+    private function removeFiles($dir)
+    {
+        return true;
+        return $files;
+    }
+
+    /**
+     * @Route("/dsl")
+     * @Template()
+     */
+    public function generate()
+    {
+        e("*** Loading DSL files");
+
+        $dsl_files = $this->getDslFiles($this->dir_dsl);
+
+        //print_r($dsl_files);
+
+        $dsl = $this->getDslString($dsl_files);
+
+        e("*** Sending request");
+        $response = $this->sendRequest($dsl);
+
+        e("*** Removing previous files");
+        $this->removeFiles($this->dir_model);
+
+        $data = json_decode($response, true);
+
+        if(!isset($data['SourceFiles']) || !is_array($data['SourceFiles'])) {
+            e('ERROR: response doesnot contain SourceFiles property');
+            e('RESPONSE:');
+            e($response);
+            die;
+        }
+
+        foreach($data['SourceFiles'] as $name=>$source) {
+            $data['SourceFiles'][$name] = $source;
+        }
+
+        e("Saving new files");
+        $this->saveFiles($data['SourceFiles'], $this->dir_model);
+
+        e('Read '.count($dsl_files).' DSL files');
+        e('Total DSL length: '.strlen($dsl));
+        e('Generated '.count($data['SourceFiles']).' php files');
+
+        echo "DONE!\n";
+
+        return array();
+    }
+}
+
+$args = $_SERVER['argv'];
+if(!$args || count($args)<4) {
+    e("Missing parameters, usage: ");
+    e("php dsl [uri] [source_dsl] [target_models]");
+}
+
+$uri = $args[1];
+$dir_dsl = realpath($args[2]);
+$dir_model = realpath($args[3]);
+
+if(!$dir_dsl) {
+    e("Dsl dir doesn't exist");
+}
+if(!$dir_model) {
+    e("Model dir doesn't exist");
+}
+
+$dsl = new DslGen($args[1], $args[2], $args[3]);
+
+$dsl->generate();

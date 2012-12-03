@@ -1,0 +1,12 @@
+.buildpath
+.project
+.settings
+*.log
+/app/cache/*
+/app/logs/*
+/*.sh
+/nbproject
+.settings
+.buildpath
+.project
+Session.vim

@@ -1,0 +1,48 @@
+jms_security_extra:
+    secure_all_services: false
+    expressions: true
+
+security:
+    providers:
+        ngs_user:
+            id: ngs.user_provider
+
+    encoders:
+        NGS\ModelBundle\Security\User: plaintext
+    
+    firewalls:
+        #temp_no_security:
+        #    pattern:  ^/
+        #   security: false
+
+        login:
+            pattern:  ^/admin/login$
+            security: false
+
+        login_firewall:
+            pattern: ^/admin/login_reset
+            security: false
+
+        secured_area:
+            pattern: ^/admin
+            form_login:
+                login_path: /admin/login
+                check_path: /admin/login_check
+            logout:
+                path:   /admin/logout
+                target: /admin
+            anonymous: ~
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_BANK
+    
+    access_control:
+        - { path: ^/login.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/home, roles: [ROLE_BANK] }
+        - { path: ^/admin/offer/active, roles: [ROLE_BANK] }
+        - { path: ^/admin/offer/archive, roles: [ROLE_BANK] }
+        - { path: ^/admin/offer/change, roles: [ROLE_BANK] }
+        - { path: ^/admin/account, roles: [ROLE_BANK] }
+        - { path: ^/admin, roles: [ROLE_ADMIN] }
+        

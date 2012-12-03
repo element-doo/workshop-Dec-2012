@@ -1,0 +1,10 @@
+{% extends 'SkolaAdminBundle::layout.html.twig' %}
+
+{% block html_body %}
+	<form action="{{ path ('skola_admin_student_save') }}" method="post" {{ form_enctype (form) }}>
+		{{ form_widget (form) }}	
+
+		<button class="btn btn-primary">Save</button>
+		<a class="btn" href="{{ path ('skola_admin_student_index') }}">Cancel</a>
+	</form>
+{% endblock %}

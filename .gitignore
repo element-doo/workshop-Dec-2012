@@ -1,3 +1,5 @@
-logs/
-config/*
-
+logs/*.log
+logs/nginx/*.log
+logs/nginx/*_log
+logs/apache2/*.log
+/nbproject/

@@ -1,0 +1,38 @@
+{% extends 'SkolaAdminBundle::layout.html.twig' %}
+
+{%block html_body %}	
+
+<p>
+	<h4>Persons</h4>
+	<a class="btn" href="add">Add new person</a>
+	<a class="btn" href="addRandom">Generate new random person</a>
+</p>
+
+{% if items | length > 0 %}
+	<table class="table table-striped table-bordered table-hover table-dark-header">
+		<thead>
+			<th>Ime</th>
+			<th>Datum rodenja</th>
+			<th></th>
+		</thead>
+		<tbody>
+			{% for row in items %}
+				<tr>
+					<td>{{ row.name }}</td>
+					<td>{{ row.birthdate | date ('m.d.Y.') }}</td>
+					<td>
+						<a class="btn pull-left" href="edit/{{ row.URI }}">Edit</a>
+						<form class="pull-left" action="delete" method="post">
+							<input type="hidden" name="URI" value="{{ row.URI }}" />
+							<button type="submit" class="btn btn-danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	No persons found
+{% endif %}
+
+{% endblock %}
