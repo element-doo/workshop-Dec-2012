@@ -27,14 +27,22 @@ foreach($everyone as $person) {
     echo 'My name is ', $person->name, ' and was born on ', $person->birthdate, '<br />';
 }
 
+echo '<h1>Short named people:</h1>';
+
+$shortPeople = Person::getShortPeople();
+
+foreach($shortPeople as $person) {
+    echo 'My name is ', $person->name, ' and I have a short name!<br />';
+}
+
 /*
 $proxy->delete($everyone);
 
 // Query again - all people should be gone
 $everyone = Person::findAll();
-*/
-
 echo 'There are '.count($everyone).' people available.';
+
+*/
 
 ?>
 
