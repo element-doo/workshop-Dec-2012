@@ -1,22 +1,24 @@
-module School
+module Workshop
 {
-  root Student
+  root Person
   {
     string firstName;
     string lastName;
 
     calculated string name from 'it => it.firstName + " " + it.lastName';
-    date birthdate;
-
-    specification getShortPeople 'it => it.name.Length < nameLimit' 
+    specification getShortPeople 'it => it.name.Length < nameLimit'
     {
-    	int nameLimit;
+      int nameLimit;
     }
+
+    date birthdate;
   }
 
   report Demographic
   {
-    Student[] minors 'it => it.birthdate.AddYears(18) >= DateTime.Today' order by birthdate;
+    Person[] minors 'it => it.birthdate.AddYears(18) >= DateTime.Today' order by birthdate;
+
+    templater createXlsx 'People.xlsx';
     templater createPdf 'People.xlsx' pdf;
   }
 }
