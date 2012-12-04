@@ -1,6 +1,6 @@
 module Workshop
 {
-  root Peron
+  root Person
   {
     string firstName;
     string lastName;
