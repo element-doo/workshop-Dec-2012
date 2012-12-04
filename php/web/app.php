@@ -14,7 +14,14 @@ $marko->persist();
 $everyone = Person::findAll();
 
 foreach($everyone as $person) {
-	echo 'My name is ', $person->firstName, ' and was born on ', $person->birthdate, '<br />';
+	echo 'My name is ', $person->name, ' and was born on ', $person->birthdate, '<br />';
+}
+
+$shortNamed = Person::getShortPeople();
+
+echo '<h1>Short ppl</h1>';
+foreach($shortNamed as $person) {
+	echo 'My name is ', $person->name, ' and I\'m a short-named person!<br />';
 }
 
 // ------------------------------------------
@@ -42,6 +49,8 @@ function generateRandomPerson() {
   $p->birthdate = $randomDate;
   return $p;
 }
+
+// ------------------------------------------
 
 ?>
 
