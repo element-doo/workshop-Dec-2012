@@ -6,7 +6,7 @@ use Workshop\Person;
 $marko = new Person(array(
 	'firstName' => 'Tester',
 	'lastName' => 'Bester',
-	'birthdate' => '1982-5-3'
+	'birthdate' => '1987-6-5'
 ));
 
 $marko->persist();
@@ -14,7 +14,7 @@ $marko->persist();
 $everyone = Person::findAll();
 
 foreach($everyone as $person) {
-	echo 'I am ', $person->firstName, ' and I\'m born in ', $person->birthdate, '<br />';
+	echo 'My name is ', $person->firstName, ' and was born on ', $person->birthdate, '<br />';
 }
 
 // ------------------------------------------
