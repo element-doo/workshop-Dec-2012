@@ -1,6 +1,6 @@
-module Workshop
+module School
 {
-  root Person
+  root Student
   {
     string firstName;
     string lastName;
@@ -16,7 +16,7 @@ module Workshop
 
   report Demographic
   {
-    Person[] minors 'it => it.birthdate.AddYears(18) >= DateTime.Today' order by birthdate;
+    Student[] minors 'it => it.birthdate.AddYears(18) >= DateTime.Today' order by birthdate;
     templater createPdf 'People.xlsx' pdf;
   }
 }

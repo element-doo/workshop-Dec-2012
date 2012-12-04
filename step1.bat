@@ -1,4 +1,4 @@
-@ECHO OFF
+@echo off
 
 cd ../server/git/bin
-git.exe --git-dir=../../../web/.git --work-tree=../../../web/ checkout master
+git.exe --git-dir=../../../web/.git --work-tree=../../../web/ checkout step1
