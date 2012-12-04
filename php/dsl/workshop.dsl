@@ -6,7 +6,10 @@ module Workshop
     string lastName;
 
     calculated string name from 'it => it.firstName + " " + it.lastName';
-    specification getShortPeople 'it => it.name.Length < 10';
+    specification getShortPeople 'it => it.name.Length < nameLimit'
+    {
+      int nameLimit;
+    }
 
     date birthdate;
   }

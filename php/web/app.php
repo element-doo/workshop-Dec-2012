@@ -29,7 +29,7 @@ foreach($everyone as $person) {
 
 echo '<h1>Short named people:</h1>';
 
-$shortPeople = Person::getShortPeople();
+$shortPeople = Person::getShortPeople(9);
 
 foreach($shortPeople as $person) {
     echo 'My name is ', $person->name, ' and I have a short name!<br />';
