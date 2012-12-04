@@ -3,3 +3,4 @@ modules
 cache
 README
 startssl-ca.pem
+project.ini
